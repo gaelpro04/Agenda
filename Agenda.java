@@ -20,7 +20,7 @@ public class Agenda
      * @param connection
      * @return
      */
-    public ArrayList<Persona> getPeopleData(Connection connection) {
+    private ArrayList<Persona> getPeopleData(Connection connection) {
         Connection conn = connection;
         Statement stmt = null;
         ResultSet rs = null;
@@ -63,12 +63,20 @@ public class Agenda
         }
     }
 
+    public ArrayList<Persona> getPeople() throws SQLException {
+        return getPeopleData(doConection(URL,USER,PASSWORD));
+    }
+
+    public ArrayList<Telefono> getTelephones() throws SQLException {
+        return getTelephonesData(doConection(URL,USER,PASSWORD));
+    }
+
     /**
      * Metodo que obtiene todos los datos de Telefonos de la base de datos
      * @param connection
      * @return
      */
-    public ArrayList<Telefono> getTelephonesData(Connection connection) {
+    private ArrayList<Telefono> getTelephonesData(Connection connection) {
         Connection conn = connection;
         Statement stmt = null;
         ResultSet rs = null;
@@ -103,12 +111,104 @@ public class Agenda
         }
     }
 
+    /**
+     * Metodo para agregar un telefono a la tabla de telefonos
+     * @param connection
+     * @param telefono
+     */
     public void addTelephoneData(Connection connection, Telefono telefono) {
+        Connection conn = connection;
+        Statement stmt = null;
 
+        updateProcessT(conn, stmt, "add", telefono);
     }
 
+    /**
+     * Metodo para agregar una persona a la base de datos
+     * @param connection
+     * @param persona
+     */
     public void addPersonData(Connection connection, Persona persona) {
+        Connection conn = connection;
+        Statement stmt = null;
 
+        updateProcessP(conn, stmt, "add", persona);
+    }
+
+    public void deletePersonData(Connection connection, Persona persona) {
+        Connection conn = connection;
+        Statement stmt = null;
+
+        updateProcessP(conn, stmt, "delete", persona);
+    }
+
+    public void deleteTelephoneData(Connection connection, Telefono telefono) {
+        Connection conn = connection;
+        Statement stmt = null;
+
+        updateProcessT(conn, stmt, "delete", telefono);
+    }
+
+    private void updateProcessP(Connection conn, Statement stmt, String updateType, Persona persona) {
+        try {
+            String nombre1 = persona.getNombre();
+            String direccion1 = persona.getDireccion();
+            int ID = persona.getId();
+
+            stmt = conn.createStatement();
+            switch (updateType) {
+                case "add":
+                    String sql = "INSERT INTO Personas (nombre,direccion) VALUES ('" + nombre1 + "','" + direccion1 + "')";
+                    stmt.executeUpdate(sql);
+                    break;
+                case "delete":
+                    String sql1 = "DELETE FROM Personas WHERE id = " + ID;
+                    stmt.executeUpdate(sql1);
+                    break;
+            }
+            stmt.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void updateProcessT(Connection conn, Statement stmt, String updateType, Telefono telefono) {
+        try {
+            int personaID = telefono.getPersonaId();
+            String numero = telefono.getTelefono();
+            int ID = telefono.getId();
+
+            stmt = conn.createStatement();
+            switch (updateType) {
+                case "add":
+                    String sql = "INSERT INTO Telefonos (personaId,telefono) VALUES (" + personaID + "," + "'" + numero + "')";
+                    stmt.executeUpdate(sql);
+                    break;
+                case "delete":
+                    String sql1 = "DELETE FROM Telefono WHERE id = " + ID;
+                    stmt.executeUpdate(sql1);
+                    break;
+            }
+            stmt.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

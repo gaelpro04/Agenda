@@ -1,4 +1,8 @@
 import javafx.application.Application;
+import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,13 +13,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class AgendaGUI extends Application {
 
-    @Override
-    public void start(Stage stage) {
+    private Agenda agenda;
 
+    @Override
+    public void start(Stage stage) throws SQLException {
+
+        agenda = new Agenda();
         BorderPane root = new BorderPane();
 
         Label labelBienv = new Label("Bienvenido a la agenda");
@@ -36,10 +44,19 @@ public class AgendaGUI extends Application {
 
         TableView<Persona> tablaPersonas = new TableView<>();
         TableColumn<Persona, Integer> colID = new TableColumn<>("ID");
+        colID.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getId()));
+
         TableColumn<Persona, String> colNombre = new TableColumn<>("Nombre");
+        colNombre.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getNombre()));
+
         TableColumn<Persona, String> colDireccion = new TableColumn<>("Direccion");
+        colDireccion.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getDireccion()));
+
         tablaPersonas.getColumns().addAll(colID, colNombre, colDireccion);
         tablaPersonas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        ObservableList<Persona> personasToTabla = FXCollections.observableArrayList(agenda.getPeople());
+        tablaPersonas.setItems(personasToTabla);
 
         VBox vBoxPersonas = new VBox(5, new Label("Personas"), tablaPersonas);
         vBoxPersonas.setPadding(new Insets(10));
@@ -47,10 +64,19 @@ public class AgendaGUI extends Application {
 
         TableView<Telefono> tablaTelefonos = new TableView<>();
         TableColumn<Telefono, Integer> telColID = new TableColumn<>("ID");
+        telColID.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getId()));
+
         TableColumn<Telefono, Integer> telColpersonaID = new TableColumn<>("personaID");
+        telColpersonaID.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getPersonaId()));
+
         TableColumn<Telefono, String> telColNumero = new TableColumn<>("Numero");
+        telColNumero.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getTelefono()));
+
         tablaTelefonos.getColumns().addAll(telColID, telColpersonaID, telColNumero);
         tablaTelefonos.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        ObservableList<Telefono> telefonosToTabla = FXCollections.observableArrayList(agenda.getTelephones());
+        tablaTelefonos.setItems(telefonosToTabla);
 
         VBox vBoxTelefonos = new VBox(5, new Label("Telefonos"), tablaTelefonos);
         vBoxTelefonos.setPadding(new Insets(10));
