@@ -111,12 +111,20 @@ public class Agenda
         }
     }
 
+    public void addPersonData(Persona persona) throws SQLException {
+        addPersonData(doConection(URL,USER,PASSWORD), persona);
+    }
+
+    public void addTelephoneData(Telefono telefono) throws SQLException {
+        addTelephoneData(doConection(URL,USER,PASSWORD), telefono);
+    }
+
     /**
      * Metodo para agregar un telefono a la tabla de telefonos
      * @param connection
      * @param telefono
      */
-    public void addTelephoneData(Connection connection, Telefono telefono) {
+    private void addTelephoneData(Connection connection, Telefono telefono) {
         Connection conn = connection;
         Statement stmt = null;
 
@@ -128,21 +136,29 @@ public class Agenda
      * @param connection
      * @param persona
      */
-    public void addPersonData(Connection connection, Persona persona) {
+    private void addPersonData(Connection connection, Persona persona) {
         Connection conn = connection;
         Statement stmt = null;
 
         updateProcessP(conn, stmt, "add", persona);
     }
 
-    public void deletePersonData(Connection connection, Persona persona) {
+    public void deletePersonData(Persona persona) throws SQLException {
+        deletePersonData(doConection(URL,USER,PASSWORD), persona);
+    }
+
+    public void deleteTelephoneData(Telefono telefono) throws SQLException {
+        deleteTelephoneData(doConection(URL,USER,PASSWORD), telefono);
+    }
+
+    private void deletePersonData(Connection connection, Persona persona) {
         Connection conn = connection;
         Statement stmt = null;
 
         updateProcessP(conn, stmt, "delete", persona);
     }
 
-    public void deleteTelephoneData(Connection connection, Telefono telefono) {
+    private void deleteTelephoneData(Connection connection, Telefono telefono) {
         Connection conn = connection;
         Statement stmt = null;
 

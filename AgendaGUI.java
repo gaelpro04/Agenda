@@ -19,6 +19,8 @@ import java.util.Scanner;
 public class AgendaGUI extends Application {
 
     private Agenda agenda;
+    private TableView<Persona> tablaPersonas;
+    private TableView<Telefono> tablaTelefonos;
 
     @Override
     public void start(Stage stage) throws SQLException {
@@ -30,19 +32,28 @@ public class AgendaGUI extends Application {
         labelBienv.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 39));
         labelBienv.setAlignment(Pos.CENTER);
         Button botonAgregar = new Button("Agregar");
+        Button botonEliminar = new Button("Eliminar");
+        Button botonEditar = new Button("Editar");
+
+        botonEditar.setAlignment(Pos.CENTER);
+        botonEditar.setOnAction(e -> botonEditar());
+
         botonAgregar.setAlignment(Pos.CENTER);
         botonAgregar.setOnAction(e -> botonAgregar());
+
+        botonEliminar.setAlignment(Pos.CENTER);
+        botonEliminar.setOnAction(e -> botonEliminar());
 
         BorderPane primerPane = new BorderPane();
         primerPane.setPadding(new Insets(20));
 
-        VBox topBox = new VBox(30);
+        VBox topBox = new VBox(10);
         topBox.setAlignment(Pos.CENTER);
-        topBox.getChildren().addAll(labelBienv, botonAgregar);
+        topBox.getChildren().addAll(labelBienv, botonAgregar, botonEliminar, botonEditar);
 
         BorderPane tablaPane = new BorderPane();
 
-        TableView<Persona> tablaPersonas = new TableView<>();
+        tablaPersonas = new TableView<>();
         TableColumn<Persona, Integer> colID = new TableColumn<>("ID");
         colID.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getId()));
 
@@ -62,7 +73,7 @@ public class AgendaGUI extends Application {
         vBoxPersonas.setPadding(new Insets(10));
         vBoxPersonas.setPrefWidth(350);
 
-        TableView<Telefono> tablaTelefonos = new TableView<>();
+        tablaTelefonos = new TableView<>();
         TableColumn<Telefono, Integer> telColID = new TableColumn<>("ID");
         telColID.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getId()));
 
@@ -102,10 +113,139 @@ public class AgendaGUI extends Application {
     }
 
     private void botonAgregar() {
+        Stage stage = new Stage();
+        stage.setTitle("Agregar");
+        BorderPane newRoot = new BorderPane();
+
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.getItems().addAll("Persona", "Telefono");
+
+        comboBox.setOnAction(e -> {
+            switch (comboBox.getValue()) {
+                case "Persona":
+                    Label labelNombre = new Label("Nombre");
+                    Label labelDireccion = new Label("Direccion");
+                    TextField TFNombre = new TextField();
+                    TextField TFDireccion = new TextField();
+                    Button botonGuardar = new Button("Guardar");
+
+                    botonGuardar.setOnAction(a -> {
+                        String nombre = TFNombre.getText();
+                        String direccion = TFDireccion.getText();
+                        Persona persona = new Persona(nombre,-1,direccion);
+                        try {
+                            agenda.addPersonData(persona);
+                            ObservableList<Persona> personasToTabla = FXCollections.observableArrayList(agenda.getPeople());
+                            tablaPersonas.setItems(personasToTabla);
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+
+                    });
+
+                    VBox personaInfo = new VBox(10, labelNombre, TFNombre, labelDireccion, TFDireccion, botonGuardar);
+                    newRoot.setCenter(personaInfo);
+                    break;
+                case "Telefono":
+                    Label labelPersonaID = new Label("PersonaID");
+                    Label labelTelefono = new Label("Telefono");
+                    TextField TFPersonaID = new TextField();
+                    TextField TFTelefono = new TextField();
+                    Button botonGuardar1 = new Button("Guardar");
+
+                    botonGuardar1.setOnAction(a1 -> {
+                        int personaID = Integer.parseInt(TFPersonaID.getText());
+                        String telefono = TFTelefono.getText();
+                        Telefono telefono1 = new Telefono(telefono,-1,personaID);
+
+                        try {
+                            agenda.addTelephoneData(telefono1);
+                            ObservableList<Telefono> telefonosToTabla = FXCollections.observableArrayList(agenda.getTelephones());
+                            tablaTelefonos.setItems(telefonosToTabla);
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    });
+
+                    VBox vTelefonosInfo = new VBox(10, labelPersonaID, TFPersonaID, labelTelefono, TFTelefono, botonGuardar1);
+                    newRoot.setCenter(vTelefonosInfo);
+                    break;
+            }
+        });
+
+        VBox vMainBox = new VBox(20, comboBox);
+        vMainBox.setAlignment(Pos.CENTER);
+
+        newRoot.setTop(vMainBox);
+        stage.setScene(new Scene(newRoot, 400, 400));
+        stage.show();
+
+    }
+
+    private void botonEliminar() {
+        Stage stage = new Stage();
+        stage.setTitle("Eliminar");
+        BorderPane newRoot = new BorderPane();
+
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.getItems().addAll("Personas", "Telefono");
+
+        comboBox.setOnAction(e -> {
+            Label labelID = new Label("Ingresa el ID a eliminar");
+            TextField TFID = new TextField();
+            Button botonEliminar = new Button("Eliminar");
+
+            botonEliminar.setOnAction(action -> {
+                if (comboBox.getValue() == "Personas") {
+                    try {
+                        int ID = Integer.parseInt(TFID.getText());
+                        Persona persona = agenda.getPeople().get(--ID);
+
+                        agenda.deletePersonData(persona);
+                        ObservableList<Persona> personasToTablas = FXCollections.observableArrayList(agenda.getPeople());
+                        ObservableList<Telefono> telefonosToTablas = FXCollections.observableArrayList(agenda.getTelephones());
+
+                        tablaPersonas.setItems(personasToTablas);
+                        tablaTelefonos.setItems(telefonosToTablas);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    try {
+                        int ID = Integer.parseInt(TFID.getText());
+                        Telefono telefono = agenda.getTelephones().get(--ID);
+
+                        agenda.deleteTelephoneData(telefono);
+                        ObservableList<Telefono> telefonosToTabla = FXCollections.observableArrayList(agenda.getTelephones());
+                        tablaTelefonos.setItems(telefonosToTabla);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+
+            VBox vPersonasID = new VBox(10, labelID, TFID, botonEliminar);
+            newRoot.setCenter(vPersonasID);
+        });
+
+        VBox vMainBox = new VBox(20, comboBox);
+        vMainBox.setAlignment(Pos.CENTER);
+
+        newRoot.setTop(vMainBox);
+        stage.setScene(new Scene(newRoot, 400, 400));
+        stage.show();
+    }
+
+    private void botonEditar() {
+
+    }
+
+    private void newStage(String tipo) {
 
     }
 
     public static void main(String[] args) {
-        launch(args); // inicia la app
+        launch(args);
+
     }
 }
