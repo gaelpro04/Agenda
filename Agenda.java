@@ -1,3 +1,4 @@
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -165,6 +166,69 @@ public class Agenda
         updateProcessT(conn, stmt, "delete", telefono);
     }
 
+    public void editPersonData(Persona persona) throws SQLException {
+        editPersonData(doConection(URL,USER,PASSWORD), persona);
+    }
+
+    public void editTelephoneData(Telefono telefono, String data) throws SQLException {
+        editTelephoneData(doConection(URL,USER,PASSWORD), telefono);
+    }
+
+    private void editPersonData(Connection connection, Persona persona) {
+        Connection conn = connection;
+        Statement stmt = null;
+        int ID = persona.getId();
+
+        try {
+            stmt = conn.createStatement();
+            String dataNombre = persona.getNombre();
+            String dataDireccion = persona.getDireccion();
+
+            String sql = "UPDATE Personas SET nombre =" + "'" + dataNombre + "' WHERE id =" + "'" + ID + "'";
+            String sql1 = "UPDATE Personas SET direccion =" + "'" + dataDireccion + "' WHERE id =" + "'" + ID + "'";
+            stmt.executeUpdate(sql);
+            stmt.executeUpdate(sql1);
+
+            conn.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private void editTelephoneData(Connection connection, Telefono telefono) {
+        Connection conn = connection;
+        Statement stmt = null;
+        int ID = telefono.getId();
+
+        try {
+            stmt = conn.createStatement();
+            String data = telefono.getTelefono();
+
+            String sql = "UPDATE Telefonos SET telefono =" + "'" + data + "' WHERE id =" + "'" + ID + "'";
+            stmt.executeUpdate(sql);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void updateProcessP(Connection conn, Statement stmt, String updateType, Persona persona) {
         try {
             String nombre1 = persona.getNombre();
@@ -181,6 +245,9 @@ public class Agenda
                     String sql1 = "DELETE FROM Personas WHERE id = " + ID;
                     stmt.executeUpdate(sql1);
                     break;
+                case "edit":
+                    break;
+
             }
             stmt.close();
 
@@ -211,6 +278,8 @@ public class Agenda
                 case "delete":
                     String sql1 = "DELETE FROM Telefono WHERE id = " + ID;
                     stmt.executeUpdate(sql1);
+                    break;
+                case "edit":
                     break;
             }
             stmt.close();

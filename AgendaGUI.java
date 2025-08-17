@@ -237,6 +237,74 @@ public class AgendaGUI extends Application {
     }
 
     private void botonEditar() {
+        Stage stage = new Stage();
+        stage.setTitle("Ediiar dato");
+        BorderPane newRoot = new BorderPane();
+
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.getItems().addAll("Persona", "Telefono");
+
+        comboBox.setOnAction(action -> {
+            Label labelID = new Label("Ingresa el ID para");
+            TextField TFD = new TextField();
+            Button botonBuscar = new Button("Buscar");
+
+            botonBuscar.setOnAction(e -> {
+                switch (comboBox.getValue()) {
+                    case "Persona":
+                        try {
+                            int ID = Integer.parseInt(TFD.getText());
+
+                            newRoot.setCenter(null);
+                            Persona persona = agenda.getPeople().get(--ID);
+
+                            Label labelNombre = new Label("Nombre");
+                            TextField TFNombre = new TextField(persona.getNombre());
+
+                            Label labelDireccion = new Label("Direccion");
+                            TextField TFDireccion = new TextField(persona.getDireccion());
+
+                            Button botonGuardar = new Button("Guardar cambios");
+
+                            botonGuardar.setOnAction(newAction -> {
+                                persona.setNombre(TFNombre.getText());
+                                persona.setDireccion(TFDireccion.getText());
+
+                                try {
+                                    agenda.editPersonData(persona);
+
+                                    ObservableList<Persona> personasToTablas = FXCollections.observableArrayList(agenda.getPeople());
+                                    tablaPersonas.setItems(personasToTablas);
+                                } catch (SQLException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            });
+
+                            VBox newBoxPerson = new VBox(10, labelNombre, TFNombre, labelDireccion, TFDireccion, botonBuscar);
+                            newRoot.setCenter(newBoxPerson);
+
+
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        } finally {
+
+                        }
+                        break;
+                    case "Telefono":
+                        break;
+                }
+            });
+
+            VBox vID = new VBox(10, labelID, TFD, botonBuscar);
+            newRoot.setCenter(vID);
+        });
+
+        VBox vMainBox = new VBox(10, comboBox);
+        vMainBox.setAlignment(Pos.CENTER);
+
+        newRoot.setTop(vMainBox);
+        stage.setScene(new Scene(newRoot, 400, 400));
+        stage.show();
 
     }
 
