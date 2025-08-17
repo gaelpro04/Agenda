@@ -199,7 +199,7 @@ public class AgendaGUI extends Application {
                 if (comboBox.getValue() == "Personas") {
                     try {
                         int ID = Integer.parseInt(TFID.getText());
-                        Persona persona = agenda.getPeople().get(--ID);
+                        Persona persona = buscarPersona(ID);
 
                         agenda.deletePersonData(persona);
                         ObservableList<Persona> personasToTablas = FXCollections.observableArrayList(agenda.getPeople());
@@ -245,18 +245,17 @@ public class AgendaGUI extends Application {
         comboBox.getItems().addAll("Persona", "Telefono");
 
         comboBox.setOnAction(action -> {
-            Label labelID = new Label("Ingresa el ID para");
+            Label labelID = new Label("Ingresa el ID");
             TextField TFD = new TextField();
             Button botonBuscar = new Button("Buscar");
 
             botonBuscar.setOnAction(e -> {
+                int ID = Integer.parseInt(TFD.getText());
                 switch (comboBox.getValue()) {
                     case "Persona":
                         try {
-                            int ID = Integer.parseInt(TFD.getText());
-
                             newRoot.setCenter(null);
-                            Persona persona = agenda.getPeople().get(--ID);
+                            Persona persona = buscarPersona(ID);
 
                             Label labelNombre = new Label("Nombre");
                             TextField TFNombre = new TextField(persona.getNombre());
@@ -264,9 +263,9 @@ public class AgendaGUI extends Application {
                             Label labelDireccion = new Label("Direccion");
                             TextField TFDireccion = new TextField(persona.getDireccion());
 
-                            Button botonGuardar = new Button("Guardar cambios");
+                            Button botonGuardar1 = new Button("Guardar cambios");
 
-                            botonGuardar.setOnAction(newAction -> {
+                            botonGuardar1.setOnAction(newAction -> {
                                 persona.setNombre(TFNombre.getText());
                                 persona.setDireccion(TFDireccion.getText());
 
@@ -280,7 +279,7 @@ public class AgendaGUI extends Application {
                                 }
                             });
 
-                            VBox newBoxPerson = new VBox(10, labelNombre, TFNombre, labelDireccion, TFDireccion, botonBuscar);
+                            VBox newBoxPerson = new VBox(10, labelNombre, TFNombre, labelDireccion, TFDireccion, botonGuardar1);
                             newRoot.setCenter(newBoxPerson);
 
 
@@ -291,6 +290,33 @@ public class AgendaGUI extends Application {
                         }
                         break;
                     case "Telefono":
+                        try {
+                            newRoot.setCenter(null);
+                            Telefono telefono = buscarTelefono(ID);
+
+                            Label labelNumero = new Label("Numero");
+                            TextField TFNumero = new TextField(telefono.getTelefono());
+                            Button botonGuardar = new Button("Guardar cambios");
+
+                            botonGuardar.setOnAction(e1 -> {
+                                telefono.setTelefono(TFNumero.getText());
+
+                                try {
+                                    agenda.editTelephoneData(telefono);
+                                    ObservableList<Telefono> telefonosToTablas = FXCollections.observableArrayList(agenda.getTelephones());
+                                    tablaTelefonos.setItems(telefonosToTablas);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                            });
+
+                            VBox newBoxTelephone = new VBox(10, labelNumero, TFNumero, botonGuardar);
+                            newRoot.setCenter(newBoxTelephone);
+
+                        } catch (SQLException e1) {
+                            e1.printStackTrace();
+                        }
+
                         break;
                 }
             });
@@ -308,8 +334,28 @@ public class AgendaGUI extends Application {
 
     }
 
-    private void newStage(String tipo) {
+    private Persona buscarPersona(int iD) throws SQLException {
 
+        int size = agenda.getPeople().size();
+        for (int i = 0; i < size; i++) {
+            Persona persona = agenda.getPeople().get(i);
+            if (iD == persona.getId()) {
+                return persona;
+            }
+        }
+        return null;
+    }
+
+    private Telefono buscarTelefono(int iD) throws SQLException {
+        int size = agenda.getTelephones().size();
+        for (int i = 0; i < size; ++i) {
+            Telefono telefono = agenda.getTelephones().get(i);
+            if (iD == telefono.getId()) {
+                return telefono;
+            }
+        }
+
+        return null;
     }
 
     public static void main(String[] args) {
