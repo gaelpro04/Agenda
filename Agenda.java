@@ -170,7 +170,8 @@ public class Agenda
         editPersonData(doConection(URL,USER,PASSWORD), persona);
     }
 
-    public void editTelephoneData(Telefono telefono) throws SQLException {
+    public void editTelephoneData(Telefono telefono
+    ) throws SQLException {
         editTelephoneData(doConection(URL,USER,PASSWORD), telefono);
     }
 
