@@ -277,7 +277,7 @@ public class Agenda
                     stmt.executeUpdate(sql);
                     break;
                 case "delete":
-                    String sql1 = "DELETE FROM Telefono WHERE id = " + ID;
+                    String sql1 = "DELETE FROM Telefonos WHERE id = " + ID;
                     stmt.executeUpdate(sql1);
                     break;
                 case "edit":

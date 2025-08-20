@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Persona {
     private String nombre;
     private int id;
@@ -37,5 +39,20 @@ public class Persona {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Persona)) return false;
+        Persona persona = (Persona) o;
+        return this.nombre.equals(persona.getNombre()) &&
+                this.id == persona.getId() &&
+                this.direccion.equals(persona.getDireccion());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre, id, direccion);
     }
 }

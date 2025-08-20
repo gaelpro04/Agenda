@@ -106,7 +106,7 @@ public class AgendaGUI extends Application {
         primerPane.setTop(topBox);
         root.setTop(primerPane);
         root.setCenter(tablaPane);
-        Scene scene = new Scene(root, 1400,750);
+        Scene scene = new Scene(root, 850,700);
         stage.setTitle("Agenda");
         stage.setScene(scene);
         stage.show();
@@ -213,7 +213,7 @@ public class AgendaGUI extends Application {
                 } else {
                     try {
                         int ID = Integer.parseInt(TFID.getText());
-                        Telefono telefono = agenda.getTelephones().get(--ID);
+                        Telefono telefono = buscarTelefono(ID);
 
                         agenda.deleteTelephoneData(telefono);
                         ObservableList<Telefono> telefonosToTabla = FXCollections.observableArrayList(agenda.getTelephones());

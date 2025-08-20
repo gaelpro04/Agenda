@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Telefono {
     private String telefono;
     private int id;
@@ -37,5 +39,20 @@ public class Telefono {
 
     public void setPersonaId(int personaId) {
         this.personaId = personaId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true; // misma referencia
+        if (!(o instanceof Telefono)) return false; // no es Persona
+        Telefono telefono = (Telefono) o; // casteamos
+        return this.telefono.equals(telefono.getTelefono()) &&
+                this.personaId ==  telefono.getPersonaId() &&
+                this.id == telefono.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(telefono,personaId,id);
     }
 }
