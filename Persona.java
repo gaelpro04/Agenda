@@ -1,20 +1,22 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Persona {
     private String nombre;
     private int id;
-    private String direccion;
+    private String direcciones;
 
     public Persona() {
         nombre = null;
         id = -1;
-        direccion = null;
+        direcciones = null;
     }
 
-    public Persona(String nombre, int id, String direccion) {
+    public Persona(String nombre, int id, String direcciones) {
         this.nombre = nombre;
         this.id = id;
-        this.direccion = direccion;
+        this.direcciones = direcciones;
     }
 
     public String getNombre() {
@@ -33,12 +35,12 @@ public class Persona {
         this.id = id;
     }
 
-    public String getDireccion() {
-        return direccion;
+    public String getDirecciones() {
+        return direcciones;
     }
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
+    public void setDirecciones(String direcciones) {
+        this.direcciones = direcciones;
     }
 
     @Override
@@ -48,11 +50,11 @@ public class Persona {
         Persona persona = (Persona) o;
         return this.nombre.equals(persona.getNombre()) &&
                 this.id == persona.getId() &&
-                this.direccion.equals(persona.getDireccion());
+                this.direcciones.equals(persona.getDirecciones());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nombre, id, direccion);
+        return Objects.hash(nombre, id, direcciones);
     }
 }

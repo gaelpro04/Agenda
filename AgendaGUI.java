@@ -61,7 +61,7 @@ public class AgendaGUI extends Application {
         colNombre.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getNombre()));
 
         TableColumn<Persona, String> colDireccion = new TableColumn<>("Direccion");
-        colDireccion.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getDireccion()));
+        colDireccion.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getDirecciones()));
 
         tablaPersonas.getColumns().addAll(colID, colNombre, colDireccion);
         tablaPersonas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -261,13 +261,13 @@ public class AgendaGUI extends Application {
                             TextField TFNombre = new TextField(persona.getNombre());
 
                             Label labelDireccion = new Label("Direccion");
-                            TextField TFDireccion = new TextField(persona.getDireccion());
+                            TextField TFDireccion = new TextField(persona.getDirecciones());
 
                             Button botonGuardar1 = new Button("Guardar cambios");
 
                             botonGuardar1.setOnAction(newAction -> {
                                 persona.setNombre(TFNombre.getText());
-                                persona.setDireccion(TFDireccion.getText());
+                                persona.setDirecciones(TFDireccion.getText());
 
                                 try {
                                     agenda.editPersonData(persona);

@@ -64,6 +64,44 @@ public class Agenda
         }
     }
 
+    private ArrayList<Direccion> getDireccionData(Connection connection) {
+        Connection conn = connection;
+        Statement stmt = null;
+        ResultSet rs = null;
+        ArrayList<Direccion> direcciones = new ArrayList<>();
+
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT * FROM Direcciones");
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String direccion = rs.getString("direccion");
+
+                direcciones.add(new Direccion(id, direccion));
+            }
+
+            rs.close();
+            stmt.close();
+            return direcciones;
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public ArrayList<Direccion> getDirecciones() throws  SQLException {
+        return getDireccionData(doConection(URL,USER,PASSWORD));
+    }
+
     public ArrayList<Persona> getPeople() throws SQLException {
         return getPeopleData(doConection(URL,USER,PASSWORD));
     }
@@ -120,6 +158,10 @@ public class Agenda
         addTelephoneData(doConection(URL,USER,PASSWORD), telefono);
     }
 
+    public void addDireccionData(Direccion direccion) throws SQLException {
+        addDireccionData(doConection(URL,USER,PASSWORD), direccion);
+    }
+
     /**
      * Metodo para agregar un telefono a la tabla de telefonos
      * @param connection
@@ -142,6 +184,13 @@ public class Agenda
         Statement stmt = null;
 
         updateProcessP(conn, stmt, "add", persona);
+    }
+
+    private void addDireccionData(Connection connection, Direccion direccion) {
+        Connection conn = connection;
+        Statement stmt = null;
+
+        updateProcessD(conn,stmt,"add", direccion);
     }
 
     public void deletePersonData(Persona persona) throws SQLException {
@@ -181,12 +230,21 @@ public class Agenda
         int ID = persona.getId();
 
         try {
+            /// ////////////////////
+            //AQUI ME QUEDE
+
             stmt = conn.createStatement();
             String dataNombre = persona.getNombre();
-            String dataDireccion = persona.getDireccion();
+            String direcciones = persona.getDirecciones();
+            ArrayList<Direccion> direccionesD = getDirecciones();
+            int cantidadDirecciones = direccionesD.size();
+
+            for (int i = 0; i < cantidadDirecciones; i++) {
+
+            }
 
             String sql = "UPDATE Personas SET nombre =" + "'" + dataNombre + "' WHERE id =" + "'" + ID + "'";
-            String sql1 = "UPDATE Personas SET direccion =" + "'" + dataDireccion + "' WHERE id =" + "'" + ID + "'";
+            String sql1 = "UPDATE Personas SET direccion =" + "'" + direcciones + "' WHERE id =" + "'" + ID + "'";
             stmt.executeUpdate(sql);
             stmt.executeUpdate(sql1);
 
@@ -230,15 +288,56 @@ public class Agenda
         }
     }
 
+    private void updateProcessD(Connection conn, Statement stmt, String updateType, Direccion direccion) {
+        try {
+            String direccion1 = direccion.getDireccion();
+            int ID = direccion.getId();
+
+            stmt = conn.createStatement();
+            switch (updateType) {
+                case "add":
+                    String sql = "INSERT INTO direcciones (direccion) VALUES ('" + direccion1 + "')";
+                    stmt.executeUpdate(sql);
+                    break;
+                case "delete":
+                    String sql1 = "DELETE FROM direcciones WHERE ID = " + ID;
+                    stmt.executeUpdate(sql1);
+                    break;
+            }
+            stmt.close();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void updateProcessP(Connection conn, Statement stmt, String updateType, Persona persona) {
         try {
             String nombre1 = persona.getNombre();
-            String direccion1 = persona.getDireccion();
+            String direccion1 = persona.getDirecciones();
+            direccion1 = direccion1.replace(" ", "");
             int ID = persona.getId();
 
             stmt = conn.createStatement();
             switch (updateType) {
                 case "add":
+
+                    ArrayList<Direccion> direcciones = getDirecciones();
+
+                    String[] direccionesS = direccion1.split(",");
+                    for (int i = 0; i < direccionesS.length; i++) {
+                        if (!direcciones.contains(direccionesS[i])) {
+                            addDireccionData(new Direccion(-1,direccionesS[i]));
+                        }
+                    }
+
                     String sql = "INSERT INTO Personas (nombre,direccion) VALUES ('" + nombre1 + "','" + direccion1 + "')";
                     stmt.executeUpdate(sql);
                     break;
@@ -307,7 +406,7 @@ public class Agenda
 
         for (int i = 0; i < personas.size(); ++i) {
             builder.append("ID: " + personas.get(i).getId() + " NOMBRE: " + personas.get(i).getNombre() + " DIRECCION: "
-            + personas.get(i).getDireccion() + "\n");
+            + personas.get(i).getDirecciones() + "\n");
         }
 
         return builder.toString();

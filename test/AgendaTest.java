@@ -89,13 +89,13 @@ public class AgendaTest {
         Persona personaModified = new Persona("testPersona", -1, "DireccionNuevaTest");
 
         agenda.addPersonData(persona);
-        String direccionVieja = agenda.getPeople().getLast().getDireccion();
+        String direccionVieja = agenda.getPeople().getLast().getDirecciones();
 
         int ID = agenda.getPeople().getLast().getId();
         personaModified.setId(ID);
 
         agenda.editPersonData(personaModified);
-        if (!direccionVieja.equals(agenda.getPeople().getLast().getDireccion()) && persona.getNombre().equals(agenda.getPeople().getLast().getNombre())) {
+        if (!direccionVieja.equals(agenda.getPeople().getLast().getDirecciones()) && persona.getNombre().equals(agenda.getPeople().getLast().getNombre())) {
             flag = true;
         }
 
