@@ -201,6 +201,10 @@ public class Agenda
         deleteTelephoneData(doConection(URL,USER,PASSWORD), telefono);
     }
 
+    public void deleteDireccionData(Direccion direccion) throws SQLException {
+        deleteDireccionData(doConection(URL,USER,PASSWORD), direccion);
+    }
+
     private void deletePersonData(Connection connection, Persona persona) {
         Connection conn = connection;
         Statement stmt = null;
@@ -215,6 +219,13 @@ public class Agenda
         updateProcessT(conn, stmt, "delete", telefono);
     }
 
+    private void deleteDireccionData(Connection connection, Direccion direccion) {
+        Connection conn = connection;
+        Statement stmt = null;
+
+        updateProcessD(conn, stmt, "delete", direccion);
+    }
+
     public void editPersonData(Persona persona) throws SQLException {
         editPersonData(doConection(URL,USER,PASSWORD), persona);
     }
@@ -224,6 +235,7 @@ public class Agenda
         editTelephoneData(doConection(URL,USER,PASSWORD), telefono);
     }
 
+    //AUN NO TERMINO
     private void editPersonData(Connection connection, Persona persona) {
         Connection conn = connection;
         Statement stmt = null;
@@ -236,12 +248,6 @@ public class Agenda
             stmt = conn.createStatement();
             String dataNombre = persona.getNombre();
             String direcciones = persona.getDirecciones();
-            ArrayList<Direccion> direccionesD = getDirecciones();
-            int cantidadDirecciones = direccionesD.size();
-
-            for (int i = 0; i < cantidadDirecciones; i++) {
-
-            }
 
             String sql = "UPDATE Personas SET nombre =" + "'" + dataNombre + "' WHERE id =" + "'" + ID + "'";
             String sql1 = "UPDATE Personas SET direccion =" + "'" + direcciones + "' WHERE id =" + "'" + ID + "'";

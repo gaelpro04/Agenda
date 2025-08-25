@@ -11,9 +11,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class AgendaGUI extends Application {
@@ -29,7 +32,7 @@ public class AgendaGUI extends Application {
         BorderPane root = new BorderPane();
 
         Label labelBienv = new Label("Bienvenido a la agenda");
-        labelBienv.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 39));
+        labelBienv.setFont(Font.font("Arial", FontWeight.BOLD, 39));
         labelBienv.setAlignment(Pos.CENTER);
         Button botonAgregar = new Button("Agregar");
         Button botonEliminar = new Button("Eliminar");
@@ -267,6 +270,60 @@ public class AgendaGUI extends Application {
 
                             botonGuardar1.setOnAction(newAction -> {
                                 persona.setNombre(TFNombre.getText());
+
+
+                                String[] direccionesNuevas = TFDireccion.getText().split(",");
+                                String[] direccionesViejas = persona.getDirecciones().split(",");
+                                ArrayList<String> direccionesNuevasA = new ArrayList<>();
+                                ArrayList<String> direccionesViejasA = new ArrayList<>();
+
+                                Collections.addAll(direccionesNuevasA, direccionesNuevas);
+                                Collections.addAll(direccionesViejasA, direccionesViejas);
+
+                                int lengthDN = direccionesNuevas.length;
+                                int lengthDV = direccionesViejas.length;
+
+                                if (lengthDV < lengthDN) {
+                                    //AQUI ME QUEDE AHORA SI
+                                } else if (lengthDV > lengthDN) {
+                                    for (int i = 0; i < lengthDV; i++) {
+                                        String stringDireccion = direccionesViejasA.get(i);
+                                        if (!direccionesNuevasA.contains(stringDireccion)) {
+                                            ArrayList<Persona> personas = null;
+                                            try {
+                                                personas = agenda.getPeople();
+                                                boolean loTienen = false;
+                                                for (int j = 0; j < personas.size(); j++) {
+                                                    String[] tempDirecciones = persona.getDirecciones().split(",");
+                                                    ArrayList<String> tempDireccionesChecado = new ArrayList<>();
+                                                    Collections.addAll(tempDireccionesChecado, tempDirecciones);
+
+                                                    if (tempDireccionesChecado.contains(stringDireccion)) {
+                                                        loTienen = true;
+                                                    }
+                                                }
+
+                                                if (!loTienen) {
+                                                    ArrayList<Direccion> direcciones = agenda.getDirecciones();
+                                                    Direccion direccionAborrar = null;
+                                                    for (int j = 0; j < direcciones.size(); j++) {
+                                                        if (direcciones.get(i).getDireccion().equals(stringDireccion)) {
+                                                            direccionAborrar = new Direccion(direcciones.get(i).getId(), stringDireccion);
+                                                            break;
+                                                        }
+                                                    }
+                                                    agenda.deleteDireccionData(direccionAborrar);
+                                                }
+                                            } catch (SQLException ex) {
+                                                throw new RuntimeException(ex);
+                                            }
+
+                                        }
+                                    }
+                                } else {
+
+                                }
+
                                 persona.setDirecciones(TFDireccion.getText());
 
                                 try {
