@@ -29,28 +29,24 @@ public class Agenda
         ArrayList<Persona> personas = new ArrayList<>();
 
         try {
-            //Enviamos una consulta SQL a la base de datos
+
             stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT id AS personaId, nombre FROM Personas");
 
-            //Resultado de la consulta, aqui contienen el contenido de Personas en la
-            //base de datos
-            rs = stmt.executeQuery("SELECT * FROM Personas");
-
-            //rs.next() permite verificar si hay siguientes datos
             while (rs.next()) {
 
                 //Se obtiene los datos de la primera fila
-                int id = rs.getInt("id");
+                int id = rs.getInt("personaId");
                 String nombre = rs.getString("nombre");
 
                 ArrayList<Direccion> direccionesPersona = new ArrayList<>();
                 Statement stmtDir = conn.createStatement();
-                String sqlDir = "SELECT direccion FROM Direcciones WHERE idPersona = " + id;
+                String sqlDir = "SELECT id AS direccionId, direccion FROM Direcciones WHERE idPersona = " + id;
                 ResultSet rsDir = stmtDir.executeQuery(sqlDir);
                 while (rsDir.next()) {
-                    int newID = rsDir.getInt("id");
+                    int newID = rsDir.getInt("direccionId");
                     String dir = rsDir.getString("direccion");
-                    direccionesPersona.add(new Direccion(newID, id, dir)); // asumiendo que Direccion tiene constructor Direccion(idPersona, direccion)
+                    direccionesPersona.add(new Direccion(newID, id, dir));
                 }
                 rsDir.close();
                 stmtDir.close();

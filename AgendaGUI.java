@@ -1,5 +1,4 @@
 import javafx.application.Application;
-import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,11 +12,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Scanner;
+
 
 public class AgendaGUI extends Application {
 
@@ -57,14 +54,14 @@ public class AgendaGUI extends Application {
         BorderPane tablaPane = new BorderPane();
 
         tablaPersonas = new TableView<>();
-        TableColumn<Object, Integer> colID = new TableColumn<>("ID");
+        TableColumn<Persona, Integer> colID = new TableColumn<>("ID");
         colID.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getId()));
 
         TableColumn<Persona, String> colNombre = new TableColumn<>("Nombre");
         colNombre.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getNombre()));
 
-        TableColumn<Direccion, String> colDireccion = new TableColumn<>("Direccion");
-        colDireccion.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getDireccion()));
+        TableColumn<Persona, String> colDireccion = new TableColumn<>("Direccion");
+        colDireccion.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(agenda.arrayToString(cellData.getValue().getDirecciones())));
 
         tablaPersonas.getColumns().addAll(colID, colNombre, colDireccion);
         tablaPersonas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -74,7 +71,7 @@ public class AgendaGUI extends Application {
 
         VBox vBoxPersonas = new VBox(5, new Label("Personas"), tablaPersonas);
         vBoxPersonas.setPadding(new Insets(10));
-        vBoxPersonas.setPrefWidth(350);
+        vBoxPersonas.setPrefWidth(600);
 
         tablaTelefonos = new TableView<>();
         TableColumn<Telefono, Integer> telColID = new TableColumn<>("ID");
@@ -94,9 +91,7 @@ public class AgendaGUI extends Application {
 
         VBox vBoxTelefonos = new VBox(5, new Label("Telefonos"), tablaTelefonos);
         vBoxTelefonos.setPadding(new Insets(10));
-        vBoxTelefonos.setPrefWidth(350);
-
-
+        vBoxTelefonos.setPrefWidth(600);
 
         HBox tablasBox = new HBox(10, vBoxPersonas, vBoxTelefonos);
         tablasBox.setPadding(new Insets(10));
@@ -109,7 +104,7 @@ public class AgendaGUI extends Application {
         primerPane.setTop(topBox);
         root.setTop(primerPane);
         root.setCenter(tablaPane);
-        Scene scene = new Scene(root, 850,700);
+        Scene scene = new Scene(root, 1200,700);
         stage.setTitle("Agenda");
         stage.setScene(scene);
         stage.show();
@@ -137,7 +132,7 @@ public class AgendaGUI extends Application {
                         String direccion = TFDireccion.getText();
                         try {
                             ArrayList<Direccion> direccionesPersona = agenda.stringToArray(direccion, agenda.getPeople().getLast().getId()+1);
-                            Persona persona = new Persona(nombre,-1, direccionesPersona);
+                            Persona persona = new Persona(nombre,agenda.getPeople().getLast().getId()+1, direccionesPersona);
 
                             agenda.addPersonData(persona);
                             ObservableList<Persona> personasToTabla = FXCollections.observableArrayList(agenda.getPeople());
