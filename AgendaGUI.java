@@ -57,14 +57,14 @@ public class AgendaGUI extends Application {
         BorderPane tablaPane = new BorderPane();
 
         tablaPersonas = new TableView<>();
-        TableColumn<Persona, Integer> colID = new TableColumn<>("ID");
+        TableColumn<Object, Integer> colID = new TableColumn<>("ID");
         colID.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getId()));
 
         TableColumn<Persona, String> colNombre = new TableColumn<>("Nombre");
         colNombre.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getNombre()));
 
-        TableColumn<Persona, String> colDireccion = new TableColumn<>("Direccion");
-        colDireccion.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getDirecciones()));
+        TableColumn<Direccion, String> colDireccion = new TableColumn<>("Direccion");
+        colDireccion.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getDireccion()));
 
         tablaPersonas.getColumns().addAll(colID, colNombre, colDireccion);
         tablaPersonas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -135,15 +135,17 @@ public class AgendaGUI extends Application {
                     botonGuardar.setOnAction(a -> {
                         String nombre = TFNombre.getText();
                         String direccion = TFDireccion.getText();
-                        Persona persona = new Persona(nombre,-1,direccion);
                         try {
+                            ArrayList<Direccion> direccionesPersona = agenda.stringToArray(direccion, agenda.getPeople().getLast().getId()+1);
+                            Persona persona = new Persona(nombre,-1, direccionesPersona);
+
                             agenda.addPersonData(persona);
                             ObservableList<Persona> personasToTabla = FXCollections.observableArrayList(agenda.getPeople());
                             tablaPersonas.setItems(personasToTabla);
+
                         } catch (SQLException ex) {
                             throw new RuntimeException(ex);
                         }
-
                     });
 
                     VBox personaInfo = new VBox(10, labelNombre, TFNombre, labelDireccion, TFDireccion, botonGuardar);
@@ -264,76 +266,25 @@ public class AgendaGUI extends Application {
                             TextField TFNombre = new TextField(persona.getNombre());
 
                             Label labelDireccion = new Label("Direccion");
-                            TextField TFDireccion = new TextField(persona.getDirecciones());
+                            TextField TFDireccion = new TextField(agenda.arrayToString(persona.getDirecciones()));
 
                             Button botonGuardar1 = new Button("Guardar cambios");
 
                             botonGuardar1.setOnAction(newAction -> {
                                 persona.setNombre(TFNombre.getText());
-
-
-                                String[] direccionesNuevas = TFDireccion.getText().split(",");
-                                String[] direccionesViejas = persona.getDirecciones().split(",");
-                                ArrayList<String> direccionesNuevasA = new ArrayList<>();
-                                ArrayList<String> direccionesViejasA = new ArrayList<>();
-
-                                Collections.addAll(direccionesNuevasA, direccionesNuevas);
-                                Collections.addAll(direccionesViejasA, direccionesViejas);
-
-                                int lengthDN = direccionesNuevas.length;
-                                int lengthDV = direccionesViejas.length;
-
-                                if (lengthDV < lengthDN) {
-                                    //AQUI ME QUEDE AHORA SI
-                                } else if (lengthDV > lengthDN) {
-                                    for (int i = 0; i < lengthDV; i++) {
-                                        String stringDireccion = direccionesViejasA.get(i);
-                                        if (!direccionesNuevasA.contains(stringDireccion)) {
-                                            ArrayList<Persona> personas = null;
-                                            try {
-                                                personas = agenda.getPeople();
-                                                boolean loTienen = false;
-                                                for (int j = 0; j < personas.size(); j++) {
-                                                    String[] tempDirecciones = persona.getDirecciones().split(",");
-                                                    ArrayList<String> tempDireccionesChecado = new ArrayList<>();
-                                                    Collections.addAll(tempDireccionesChecado, tempDirecciones);
-
-                                                    if (tempDireccionesChecado.contains(stringDireccion)) {
-                                                        loTienen = true;
-                                                    }
-                                                }
-
-                                                if (!loTienen) {
-                                                    ArrayList<Direccion> direcciones = agenda.getDirecciones();
-                                                    Direccion direccionAborrar = null;
-                                                    for (int j = 0; j < direcciones.size(); j++) {
-                                                        if (direcciones.get(i).getDireccion().equals(stringDireccion)) {
-                                                            direccionAborrar = new Direccion(direcciones.get(i).getId(), stringDireccion);
-                                                            break;
-                                                        }
-                                                    }
-                                                    agenda.deleteDireccionData(direccionAborrar);
-                                                }
-                                            } catch (SQLException ex) {
-                                                throw new RuntimeException(ex);
-                                            }
-
-                                        }
-                                    }
-                                } else {
-
-                                }
-
-                                persona.setDirecciones(TFDireccion.getText());
-
                                 try {
-                                    agenda.editPersonData(persona);
+                                    persona.setDirecciones(agenda.stringToArray(TFDireccion.getText(), persona.getId()));
 
+
+                                    agenda.editPersonData(persona);
                                     ObservableList<Persona> personasToTablas = FXCollections.observableArrayList(agenda.getPeople());
                                     tablaPersonas.setItems(personasToTablas);
+
                                 } catch (SQLException ex) {
                                     throw new RuntimeException(ex);
                                 }
+
+
                             });
 
                             VBox newBoxPerson = new VBox(10, labelNombre, TFNombre, labelDireccion, TFDireccion, botonGuardar1);

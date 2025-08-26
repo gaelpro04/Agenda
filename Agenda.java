@@ -1,4 +1,5 @@
 import javax.swing.plaf.nimbus.State;
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -41,10 +42,21 @@ public class Agenda
                 //Se obtiene los datos de la primera fila
                 int id = rs.getInt("id");
                 String nombre = rs.getString("nombre");
-                String direccion = rs.getString("direccion");
+
+                ArrayList<Direccion> direccionesPersona = new ArrayList<>();
+                Statement stmtDir = conn.createStatement();
+                String sqlDir = "SELECT direccion FROM Direcciones WHERE idPersona = " + id;
+                ResultSet rsDir = stmtDir.executeQuery(sqlDir);
+                while (rsDir.next()) {
+                    int newID = rsDir.getInt("id");
+                    String dir = rsDir.getString("direccion");
+                    direccionesPersona.add(new Direccion(newID, id, dir)); // asumiendo que Direccion tiene constructor Direccion(idPersona, direccion)
+                }
+                rsDir.close();
+                stmtDir.close();
 
                 //Se aniade al Arraylist
-                personas.add(new Persona(nombre, id, direccion));
+                personas.add(new Persona(nombre, id, direccionesPersona));
             }
 
             rs.close();
@@ -76,9 +88,11 @@ public class Agenda
 
             while (rs.next()) {
                 int id = rs.getInt("id");
+                int idPersona = rs.getInt("idPersona");
                 String direccion = rs.getString("direccion");
 
-                direcciones.add(new Direccion(id, direccion));
+
+                direcciones.add(new Direccion(id,idPersona, direccion));
             }
 
             rs.close();
@@ -183,7 +197,7 @@ public class Agenda
         Connection conn = connection;
         Statement stmt = null;
 
-        updateProcessP(conn, stmt, "add", persona);
+        updateProcessPD(conn, stmt, "add", persona);
     }
 
     private void addDireccionData(Connection connection, Direccion direccion) {
@@ -209,7 +223,7 @@ public class Agenda
         Connection conn = connection;
         Statement stmt = null;
 
-        updateProcessP(conn, stmt, "delete", persona);
+        updateProcessPD(conn, stmt, "delete", persona);
     }
 
     private void deleteTelephoneData(Connection connection, Telefono telefono) {
@@ -244,15 +258,47 @@ public class Agenda
         try {
             /// ////////////////////
             //AQUI ME QUEDE
-
             stmt = conn.createStatement();
             String dataNombre = persona.getNombre();
-            String direcciones = persona.getDirecciones();
 
             String sql = "UPDATE Personas SET nombre =" + "'" + dataNombre + "' WHERE id =" + "'" + ID + "'";
-            String sql1 = "UPDATE Personas SET direccion =" + "'" + direcciones + "' WHERE id =" + "'" + ID + "'";
             stmt.executeUpdate(sql);
-            stmt.executeUpdate(sql1);
+
+            ArrayList<String> direccionesBD = new ArrayList<>();
+            String sqlSelect = "SELECT direccion FROM Direcciones WHERE idPersona = " + persona.getId();
+            ResultSet rs = stmt.executeQuery(sqlSelect);
+            while (rs.next()) {
+                direccionesBD.add(rs.getString("direccion"));
+            }
+            rs.close();
+
+            ArrayList<String> direccionesStringPersona = new ArrayList<>();
+            for (int i = 0; i < persona.getDirecciones().size(); i++) {
+                direccionesStringPersona.add(persona.getDirecciones().get(i).getDireccion());
+            }
+
+            ArrayList<String> direccionEliminar = new ArrayList<>();
+            for (String direccionString : direccionesBD) {
+                if (!direccionesStringPersona.contains(direccionString)) {
+                    direccionEliminar.add(direccionString);
+                }
+
+            }
+
+            ArrayList<String> direccionesAgregar = new ArrayList<>();
+            for (String direccionSP : direccionesStringPersona) {
+                if (!direccionesBD.contains(direccionSP)) {
+                    direccionesAgregar.add(direccionSP);
+                }
+            }
+
+            for (String eliminar : direccionEliminar) {
+                deleteDireccionData(new Direccion(getDirecciones().getLast().getId(), persona.getId(), eliminar));
+            }
+
+            for (String agregar : direccionesAgregar) {
+                addDireccionData(new Direccion(getDirecciones().getLast().getId(), persona.getId(), agregar));
+            }
 
             conn.close();
             stmt.close();
@@ -297,16 +343,19 @@ public class Agenda
     private void updateProcessD(Connection conn, Statement stmt, String updateType, Direccion direccion) {
         try {
             String direccion1 = direccion.getDireccion();
-            int ID = direccion.getId();
+            int idPersona = direccion.getId();
 
             stmt = conn.createStatement();
             switch (updateType) {
                 case "add":
-                    String sql = "INSERT INTO direcciones (direccion) VALUES ('" + direccion1 + "')";
+                    String sql = "INSERT INTO direcciones (idPersona, direccion) VALUES ("
+                        + idPersona + ", '" + direccion1 + "')";
+
                     stmt.executeUpdate(sql);
                     break;
                 case "delete":
-                    String sql1 = "DELETE FROM direcciones WHERE ID = " + ID;
+                    String sql1 = "DELETE FROM direcciones WHERE IdPersona = " + direccion.getIdPersona() + " " +
+                            "AND direccion = '" + direccion.getDireccion()+ "'";
                     stmt.executeUpdate(sql1);
                     break;
             }
@@ -324,10 +373,10 @@ public class Agenda
         }
     }
 
-    private void updateProcessP(Connection conn, Statement stmt, String updateType, Persona persona) {
+    private void updateProcessPD(Connection conn, Statement stmt, String updateType, Persona persona) {
         try {
             String nombre1 = persona.getNombre();
-            String direccion1 = persona.getDirecciones();
+            String direccion1 = arrayToString(persona.getDirecciones());
             direccion1 = direccion1.replace(" ", "");
             int ID = persona.getId();
 
@@ -335,25 +384,24 @@ public class Agenda
             switch (updateType) {
                 case "add":
 
-                    ArrayList<Direccion> direcciones = getDirecciones();
+                    String sql = "INSERT INTO Personas (nombre) VALUES ('" + nombre1 + "')";
+                    stmt.executeUpdate(sql);
 
-                    String[] direccionesS = direccion1.split(",");
-                    for (int i = 0; i < direccionesS.length; i++) {
-                        if (!direcciones.contains(direccionesS[i])) {
-                            addDireccionData(new Direccion(-1,direccionesS[i]));
-                        }
+                    ArrayList<Direccion> direcciones = getDirecciones();
+                    ArrayList<Direccion> direccionesPersona = persona.getDirecciones();
+                    for (int i = 0; i < direccionesPersona.size(); i++) {
+                        Direccion direccion = direccionesPersona.get(i);
+                        int ultimaID = direcciones.getLast().getId();
+                        addDireccionData(new Direccion(ultimaID+1,persona.getId(),direccion.getDireccion()));
                     }
 
-                    String sql = "INSERT INTO Personas (nombre,direccion) VALUES ('" + nombre1 + "','" + direccion1 + "')";
-                    stmt.executeUpdate(sql);
+
+
                     break;
                 case "delete":
                     String sql1 = "DELETE FROM Personas WHERE id = " + ID;
                     stmt.executeUpdate(sql1);
                     break;
-                case "edit":
-                    break;
-
             }
             stmt.close();
 
@@ -401,6 +449,32 @@ public class Agenda
             }
         }
     }
+
+    public String arrayToString(ArrayList<Direccion> direcciones) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < direcciones.size(); i++) {
+            if (i == direcciones.size() - 1) {
+                sb.append(direcciones.get(i).getDireccion());
+            } else {
+                sb.append(direcciones.get(i).getDireccion() + ",");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public ArrayList<Direccion> stringToArray(String direcciones, int idPersona) throws SQLException {
+        ArrayList<Direccion> direccionesNuevas = new ArrayList<>();
+        String[] direccionString = direcciones.split(",");
+
+        for (int i = 0; i < direccionString.length; i++) {
+            direccionesNuevas.add(new Direccion(-1,idPersona, direccionString[i]));
+        }
+
+        return direccionesNuevas;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //ToStrings de cada tabla

@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Persona {
     private String nombre;
     private int id;
-    private String direcciones;
+    private ArrayList<Direccion> direcciones;
 
     public Persona() {
         nombre = null;
@@ -13,10 +13,16 @@ public class Persona {
         direcciones = null;
     }
 
-    public Persona(String nombre, int id, String direcciones) {
+    public Persona(String nombre, int id, ArrayList<Direccion> direcciones) {
         this.nombre = nombre;
         this.id = id;
         this.direcciones = direcciones;
+    }
+
+    public Persona(String nombre, int id) {
+        this.nombre = nombre;
+        this.id = id;
+        direcciones = new ArrayList<>();
     }
 
     public String getNombre() {
@@ -35,12 +41,16 @@ public class Persona {
         this.id = id;
     }
 
-    public String getDirecciones() {
+    public ArrayList<Direccion> getDirecciones() {
         return direcciones;
     }
 
-    public void setDirecciones(String direcciones) {
+    public void setDirecciones(ArrayList<Direccion> direcciones) {
         this.direcciones = direcciones;
+    }
+
+    public void addDireccion(Direccion direccion) {
+        direcciones.add(direccion);
     }
 
     @Override
