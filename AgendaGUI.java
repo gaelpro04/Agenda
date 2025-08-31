@@ -134,7 +134,7 @@ public class AgendaGUI extends Application {
                             ArrayList<Direccion> direccionesPersona = agenda.stringToArray(direccion, agenda.getPeople().getLast().getId()+1);
                             Persona persona = new Persona(nombre,agenda.getPeople().getLast().getId()+1, direccionesPersona);
 
-                            agenda.addPersonData(persona);
+                            agenda.addPerson(persona);
                             ObservableList<Persona> personasToTabla = FXCollections.observableArrayList(agenda.getPeople());
                             tablaPersonas.setItems(personasToTabla);
 
@@ -159,7 +159,7 @@ public class AgendaGUI extends Application {
                         Telefono telefono1 = new Telefono(telefono,-1,personaID);
 
                         try {
-                            agenda.addTelephoneData(telefono1);
+                            agenda.addTelephone(telefono1);
                             ObservableList<Telefono> telefonosToTabla = FXCollections.observableArrayList(agenda.getTelephones());
                             tablaTelefonos.setItems(telefonosToTabla);
                         } catch (SQLException ex) {
@@ -201,7 +201,7 @@ public class AgendaGUI extends Application {
                         int ID = Integer.parseInt(TFID.getText());
                         Persona persona = buscarPersona(ID);
 
-                        agenda.deletePersonData(persona);
+                        agenda.deletePerson(persona);
                         ObservableList<Persona> personasToTablas = FXCollections.observableArrayList(agenda.getPeople());
                         ObservableList<Telefono> telefonosToTablas = FXCollections.observableArrayList(agenda.getTelephones());
 
@@ -215,7 +215,7 @@ public class AgendaGUI extends Application {
                         int ID = Integer.parseInt(TFID.getText());
                         Telefono telefono = buscarTelefono(ID);
 
-                        agenda.deleteTelephoneData(telefono);
+                        agenda.deleteTelephone(telefono);
                         ObservableList<Telefono> telefonosToTabla = FXCollections.observableArrayList(agenda.getTelephones());
                         tablaTelefonos.setItems(telefonosToTabla);
                     } catch (SQLException ex) {
@@ -271,7 +271,7 @@ public class AgendaGUI extends Application {
                                     persona.setDirecciones(agenda.stringToArray(TFDireccion.getText(), persona.getId()));
 
 
-                                    agenda.editPersonData(persona);
+                                    agenda.editPerson(persona);
                                     ObservableList<Persona> personasToTablas = FXCollections.observableArrayList(agenda.getPeople());
                                     tablaPersonas.setItems(personasToTablas);
 
@@ -305,7 +305,7 @@ public class AgendaGUI extends Application {
                                 telefono.setTelefono(TFNumero.getText());
 
                                 try {
-                                    agenda.editTelephoneData(telefono);
+                                    agenda.editTelephone(telefono);
                                     ObservableList<Telefono> telefonosToTablas = FXCollections.observableArrayList(agenda.getTelephones());
                                     tablaTelefonos.setItems(telefonosToTablas);
                                 } catch (SQLException ex) {

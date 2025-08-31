@@ -43,9 +43,9 @@ public class Telefono {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true; // misma referencia
-        if (!(o instanceof Telefono)) return false; // no es Persona
-        Telefono telefono = (Telefono) o; // casteamos
+        if (this == o) return true;
+        if (!(o instanceof Telefono)) return false;
+        Telefono telefono = (Telefono) o;
         return this.telefono.equals(telefono.getTelefono()) &&
                 this.personaId ==  telefono.getPersonaId() &&
                 this.id == telefono.getId();
