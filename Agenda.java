@@ -245,15 +245,12 @@ public class Agenda
         editTelephoneData(doConection(URL,USER,PASSWORD), telefono);
     }
 
-    //AUN NO TERMINO
     private void editPersonData(Connection connection, Persona persona) {
         Connection conn = connection;
         Statement stmt = null;
         int ID = persona.getId();
 
         try {
-            /// ////////////////////
-            //AQUI ME QUEDE
             stmt = conn.createStatement();
             String dataNombre = persona.getNombre();
 
