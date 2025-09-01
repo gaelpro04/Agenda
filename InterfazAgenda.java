@@ -1,7 +1,10 @@
 import java.util.ArrayList;
 import java.sql.*;
 
+//Se supone que se crea esta clase para que si alguna vez sen ecesita cambiar
+//el metodo de utilizar SQL, simplemente se haga con esta intefaz.
 public interface InterfazAgenda {
+    Connection doConnection() throws SQLException;
     ArrayList<Persona> getPeople() throws SQLException;
     ArrayList<Direccion> getDirecciones() throws SQLException;
     ArrayList<Telefono> getTelefonos() throws SQLException;

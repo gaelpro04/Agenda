@@ -14,21 +14,21 @@ public class AgendaTest {
 
     @Test
     void testGetPeopleData() throws SQLException {
-        Agenda agenda = new Agenda();
+        Agenda agenda = new Agenda(new AgendaSQL());
         ArrayList<Persona> personas = agenda.getPeople();
         assertNotNull(personas);
     }
 
     @Test
     void testGetTelephoneData() throws SQLException {
-        Agenda agenda = new Agenda();
+        Agenda agenda = new Agenda(new AgendaSQL());
         ArrayList<Telefono> telefonos = agenda.getTelephones();
         assertNotNull(telefonos);
     }
 
     @Test
     void testAddPersonData() throws SQLException {
-        Agenda agenda = new Agenda();
+        Agenda agenda = new Agenda((new AgendaSQL()));
         ArrayList<Direccion> direccionTest = new ArrayList<>();
         direccionTest.add(new Direccion(agenda.getDirecciones().getLast().getId()+1, agenda.getPeople().getLast().getId()+1, "Main Street"));
         Persona persona = new Persona("Gael",agenda.getPeople().getLast().getId()+1,direccionTest);
@@ -41,7 +41,7 @@ public class AgendaTest {
 
     @Test
     void testAddTelephoneData() throws SQLException {
-       Agenda agenda = new Agenda();
+       Agenda agenda = new Agenda((new AgendaSQL()));
        Telefono telefono = new Telefono("999-1234567",-1,2);
        agenda.addTelephone(telefono);
        telefono.setId(agenda.getTelephones().getLast().getId());
@@ -52,7 +52,7 @@ public class AgendaTest {
     @Test
     void testDeletePersonData() throws SQLException {
         boolean flag = false;
-        Agenda agenda = new Agenda();
+        Agenda agenda = new Agenda((new AgendaSQL()));
         ArrayList<Direccion> direccionTest = new ArrayList<>();
         direccionTest.add(new Direccion(agenda.getDirecciones().getLast().getId()+1, agenda.getPeople().getLast().getId()+1, "Main Street"));
         Persona persona = new Persona("nombreTest",agenda.getPeople().getLast().getId()+1,direccionTest);
@@ -67,7 +67,7 @@ public class AgendaTest {
     @Test
     void testDeleteTelephonedata() throws SQLException {
         boolean flag = false;
-        Agenda agenda = new Agenda();
+        Agenda agenda = new Agenda((new AgendaSQL()));
         Telefono telefono = new Telefono("203-1234567", -1, 2);
         agenda.addTelephone(telefono);
         telefono.setId(agenda.getTelephones().getLast().getId());
@@ -80,7 +80,7 @@ public class AgendaTest {
     @Test
     void testEditPersonData() throws SQLException {
         boolean flag = false;
-        Agenda agenda = new Agenda();
+        Agenda agenda = new Agenda((new AgendaSQL()));
 
         ArrayList<Direccion> direccionesViejas = new ArrayList<>();
         direccionesViejas.add(new Direccion(agenda.getDirecciones().getLast().getId()+1,agenda.getPeople().getLast().getId()+1,"DireccionTest"));
@@ -114,7 +114,7 @@ public class AgendaTest {
     @Test
     void testEditTelephoneData() throws SQLException {
         boolean flag = false;
-        Agenda agenda = new Agenda();
+        Agenda agenda = new Agenda((new AgendaSQL()));
 
         Telefono telefono = new Telefono("123-2222222", -1, 2);
         Telefono telefonoModified = new Telefono("123-2222223", -1, 2);

@@ -5,59 +5,80 @@ import java.util.ArrayList;
 
 public class Agenda
 {
-    private AgendaSQL agendaSQL;
+    private InterfazAgenda agendaSQL;
+
+    public Agenda(InterfazAgenda agendaSQL) {
+        this.agendaSQL = agendaSQL;
+    }
 
     public ArrayList<Persona> getPeople() throws SQLException {
-        return agendaSQL.getPeopledataFromSQL();
+        return agendaSQL.getPeople();
     }
 
     public ArrayList<Direccion> getDirecciones() throws SQLException {
-        return agendaSQL.getDireccionDataFromSQL();
+        return agendaSQL.getDirecciones();
     }
 
 
     public ArrayList<Telefono> getTelephones() throws SQLException {
-        return agendaSQL.getTelephonesDataFromSQL();
+        return agendaSQL.getTelefonos();
     }
 
 
     public void addPerson(Persona persona) throws SQLException {
-        agendaSQL.addPersonDataFromSQL(persona);
+        agendaSQL.addPerson(persona);
     }
 
     public void addTelephone(Telefono telefono) throws SQLException {
-        agendaSQL.addTelephoneDataFromSQL(telefono);
+        agendaSQL.addTelephone(telefono);
     }
 
     public void addDireccion(Direccion direccion) throws SQLException {
-        agendaSQL.addDireccionDataFromSQL(direccion);
+        agendaSQL.addDireccion(direccion);
     }
 
     public void deletePerson(Persona persona) throws SQLException {
-        agendaSQL.deletePersonDataFromSQL(persona);
+        agendaSQL.deletePerson(persona);
     }
 
     public void deleteTelephone(Telefono telefono) throws SQLException {
-        agendaSQL.deleteTelephoneDataFromSQL(telefono);
+        agendaSQL.deleteTelephone(telefono);
     }
 
     public void deleteDireccion(Direccion direccion) throws SQLException {
-        agendaSQL.deleteDireccionDataFromSQL(direccion);
+        agendaSQL.deleteDireccion(direccion);
     }
 
     public void editPerson(Persona persona) throws SQLException {
-        agendaSQL.editPersonDataFromSQL(persona);
+        agendaSQL.editPerson(persona);
     }
 
     public void editTelephone(Telefono telefono) throws SQLException {
-        agendaSQL.editTelephoneDataFromSQL(telefono);
-    }
-
-    public String arrayToString(ArrayList<Direccion> direcciones) {
-        return agendaSQL.arrayToString(direcciones);
+        agendaSQL.editTelephone(telefono);
     }
 
     public ArrayList<Direccion> stringToArray(String direcciones, int idPersona) throws SQLException {
-        return agendaSQL.stringToArray(direcciones, idPersona);
+        ArrayList<Direccion> direccionesNuevas = new ArrayList<>();
+        String[] direccionString = direcciones.split(",");
+
+        for (int i = 0; i < direccionString.length; i++) {
+            direccionesNuevas.add(new Direccion(-1,idPersona, direccionString[i]));
+        }
+
+        return direccionesNuevas;
+    }
+
+    public String arrayToString(ArrayList<Direccion> direcciones) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < direcciones.size(); i++) {
+            if (i == direcciones.size() - 1) {
+                sb.append(direcciones.get(i).getDireccion());
+            } else {
+                sb.append(direcciones.get(i).getDireccion() + ",");
+            }
+        }
+
+        return sb.toString();
     }
 }

@@ -6,54 +6,61 @@ public class AgendaSQL implements InterfazAgenda {
     private static final String USER = "usuario1";
     private static final String PASSWORD = "superpassword";
 
-    public Connection doConection() throws SQLException {
+    @Override
+    public Connection doConnection() throws SQLException {
         return DriverManager.getConnection(URL,USER,PASSWORD);
     }
 
     public void addDireccionDataFromSQL(Direccion direccion) throws SQLException {
-        Connection conn = doConection();
+        Connection conn = doConnection();
         Statement stmt = null;
 
         updateProcessD(conn,stmt,"add", direccion);
     }
 
-    public void addPersonDataFromSQL(Persona persona) throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public void addPerson(Persona persona) throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
 
         updateProcessPD(conn, stmt, "add", persona);
     }
 
-    public void addTelephoneDataFromSQL(Telefono telefono) throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public void addTelephone(Telefono telefono) throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
 
         updateProcessT(conn, stmt, "add", telefono);
     }
 
-    public void deletePersonDataFromSQL(Persona persona) throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public void deletePerson(Persona persona) throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
 
         updateProcessPD(conn, stmt, "delete", persona);
     }
 
-    public void deleteTelephoneDataFromSQL(Telefono telefono) throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public void deleteTelephone(Telefono telefono) throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
 
         updateProcessT(conn, stmt, "delete", telefono);
     }
 
-    public void deleteDireccionDataFromSQL(Direccion direccion) throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public void deleteDireccion(Direccion direccion) throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
 
         updateProcessD(conn, stmt, "delete", direccion);
     }
 
-    public void editPersonDataFromSQL(Persona persona) throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public void editPerson(Persona persona) throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
         int ID = persona.getId();
 
@@ -95,11 +102,11 @@ public class AgendaSQL implements InterfazAgenda {
             }
 
             for (String eliminar : direccionEliminar) {
-                deleteDireccionDataFromSQL(new Direccion(getDireccionDataFromSQL().getLast().getId(), persona.getId(), eliminar));
+                deleteDireccion(new Direccion(getDirecciones().getLast().getId(), persona.getId(), eliminar));
             }
 
             for (String agregar : direccionesAgregar) {
-                addDireccionDataFromSQL(new Direccion(getDireccionDataFromSQL().getLast().getId(), persona.getId(), agregar));
+                addDireccionDataFromSQL(new Direccion(getDirecciones().getLast().getId(), persona.getId(), agregar));
             }
 
             conn.close();
@@ -118,8 +125,9 @@ public class AgendaSQL implements InterfazAgenda {
 
     }
 
-    public void editTelephoneDataFromSQL(Telefono telefono) throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public void editTelephone(Telefono telefono) throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
         int ID = telefono.getId();
 
@@ -142,8 +150,9 @@ public class AgendaSQL implements InterfazAgenda {
         }
     }
 
-    public ArrayList<Persona> getPeopledataFromSQL() throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public ArrayList<Persona> getPeople() throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
         ResultSet rs = null;
         ArrayList<Persona> personas = new ArrayList<>();
@@ -192,8 +201,9 @@ public class AgendaSQL implements InterfazAgenda {
         }
     }
 
-    public ArrayList<Direccion> getDireccionDataFromSQL() throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public ArrayList<Direccion> getDirecciones() throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
         ResultSet rs = null;
         ArrayList<Direccion> direcciones = new ArrayList<>();
@@ -228,8 +238,9 @@ public class AgendaSQL implements InterfazAgenda {
         }
     }
 
-    public ArrayList<Telefono> getTelephonesDataFromSQL() throws SQLException {
-        Connection conn = doConection();
+    @Override
+    public ArrayList<Telefono> getTelefonos() throws SQLException {
+        Connection conn = doConnection();
         Statement stmt = null;
         ResultSet rs = null;
         ArrayList<Telefono> telefonos = new ArrayList<>();
@@ -310,7 +321,7 @@ public class AgendaSQL implements InterfazAgenda {
                     String sql = "INSERT INTO Personas (nombre) VALUES ('" + nombre1 + "')";
                     stmt.executeUpdate(sql);
 
-                    ArrayList<Direccion> direcciones = getDireccionDataFromSQL();
+                    ArrayList<Direccion> direcciones = getDirecciones();
                     ArrayList<Direccion> direccionesPersona = persona.getDirecciones();
                     for (int i = 0; i < direccionesPersona.size(); i++) {
                         Direccion direccion = direccionesPersona.get(i);
@@ -373,83 +384,10 @@ public class AgendaSQL implements InterfazAgenda {
         }
     }
 
-    public String arrayToString(ArrayList<Direccion> direcciones) {
-        StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < direcciones.size(); i++) {
-            if (i == direcciones.size() - 1) {
-                sb.append(direcciones.get(i).getDireccion());
-            } else {
-                sb.append(direcciones.get(i).getDireccion() + ",");
-            }
-        }
-
-        return sb.toString();
-    }
-
-    public ArrayList<Direccion> stringToArray(String direcciones, int idPersona) throws SQLException {
-        ArrayList<Direccion> direccionesNuevas = new ArrayList<>();
-        String[] direccionString = direcciones.split(",");
-
-        for (int i = 0; i < direccionString.length; i++) {
-            direccionesNuevas.add(new Direccion(-1,idPersona, direccionString[i]));
-        }
-
-        return direccionesNuevas;
-    }
-
-    @Override
-    public ArrayList<Persona> getPeople() throws SQLException {
-        return null;
-    }
-
-    @Override
-    public ArrayList<Direccion> getDirecciones() throws SQLException {
-        return null;
-    }
-
-    @Override
-    public ArrayList<Telefono> getTelefonos() throws SQLException {
-        return null;
-    }
-
-    @Override
-    public void addPerson(Persona persona) throws SQLException {
-
-    }
-
-    @Override
-    public void addTelephone(Telefono telefono) throws SQLException {
-
-    }
 
     @Override
     public void addDireccion(Direccion direccion) throws SQLException {
-
-    }
-
-    @Override
-    public void deletePerson(Persona persona) throws SQLException {
-
-    }
-
-    @Override
-    public void deleteTelephone(Telefono telefono) throws SQLException {
-
-    }
-
-    @Override
-    public void deleteDireccion(Direccion direccion) throws SQLException {
-
-    }
-
-    @Override
-    public void editPerson(Persona persona) throws SQLException {
-
-    }
-
-    @Override
-    public void editTelephone(Telefono telefono) throws SQLException {
 
     }
 }

@@ -25,7 +25,7 @@ public class AgendaGUI extends Application {
     @Override
     public void start(Stage stage) throws SQLException {
 
-        agenda = new Agenda();
+        agenda = new Agenda(new AgendaSQL());
         BorderPane root = new BorderPane();
 
         Label labelBienv = new Label("Bienvenido a la agenda");
