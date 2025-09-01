@@ -384,7 +384,19 @@ public class AgendaSQL implements InterfazAgenda {
         }
     }
 
+    public String arrayToString(ArrayList<Direccion> direcciones) {
+        StringBuilder sb = new StringBuilder();
 
+        for (int i = 0; i < direcciones.size(); i++) {
+            if (i == direcciones.size() - 1) {
+                sb.append(direcciones.get(i).getDireccion());
+            } else {
+                sb.append(direcciones.get(i).getDireccion() + ",");
+            }
+        }
+
+        return sb.toString();
+    }
 
     @Override
     public void addDireccion(Direccion direccion) throws SQLException {
